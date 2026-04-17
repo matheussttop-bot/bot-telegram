@@ -5,7 +5,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes, MessageHandler, filters
 
 # ===== CONFIG =====
-TOKEN = os.getenv("8719037892:AAF_O55ZLS4l-LK19KU_w9W2NorhuxoBqoI")
+TOKEN = os.getenv("TOKEN")
 
 GROUP_ID = -1002312326448
 ADMINS = [7966376623]
