@@ -12,7 +12,7 @@ ADMINS = [7966376623]
 
 SUPORTE = "https://t.me/teus_67"
 
-PAYPAL = "susanesantos40@gmail.com"
+PAYPAL = "susanesantos4@gmail.com"
 CASHAPP = "$BassBaddict"
 
 PLANOS = {
