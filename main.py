@@ -14,6 +14,16 @@ SUPORTE = "https://t.me/teus_67"
 
 PAYPAL = "susanesantos4@gmail.com"
 CASHAPP = "$BassBaddict"
+REVOLUT = "@seu_usuario_revolut"
+CRYPTO_ADDRESS = "0xSeuEnderecoUSDTaqui"
+
+# Dicionário para facilitar a exibição de cada método
+METODOS_PAGAMENTO = {
+    "pay": ("PayPal", f"PayPal: {PAYPAL}", "https://media.discordapp.net/attachments/1317858068255473685/1504617442947760259/photo_2026-05-05_15-39-26.jpg?ex=6a07a3b0&is=6a065230&hm=50f479a5a216a6ca2f13c3962c3e38454d9e1c337a2cd96484877f21d1847b15&"),
+    "cash": ("CashApp", f"CashApp: {CASHAPP}", "URL_OU_FILE_ID_QR_CASHAPP"),
+    "rev": ("Revolut", f"Revolut: {REVOLUT}", "URL_OU_FILE_ID_QR_REVOLUT"),
+    "cryp": ("Crypto (USDT)", f"USDT Address:\n`{CRYPTO_ADDRESS}`", "URL_OU_FILE_ID_QR_CRYPTO")
+}
 
 PLANOS = {
     "1m": (30, "1 Month — $25"),
@@ -87,46 +97,56 @@ Let me know if you’d like to join and I’ll guide you through everything 👍
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-# ===== PLANOS =====
-async def unlock(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await safe_answer(query)
-
-    salvar_usuario(query.from_user.id)
-
-    keyboard = []
-    for key, value in PLANOS.items():
-        keyboard.append([InlineKeyboardButton(value[1], callback_data=f"plan_{key}")])
-
-    await query.message.reply_text("Choose your plan 👇", reply_markup=InlineKeyboardMarkup(keyboard))
-
-# ===== ESCOLHA =====
+# ===== ESCOLHA DO PLANO =====
 async def select_plan(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await safe_answer(query)
 
     plano = query.data.split("_")[1]
-    context.user_data["plano"] = plano
+    context.user_data["plano"] = plano  # Salva o plano escolhido
 
-    texto = f"""
-💳 Payment Methods
-
-PayPal:
-{PAYPAL}
-
-CashApp:
-{CASHAPP}
-
-Selected:
-{PLANOS[plano][1]}
-
-Send proof after payment.
-"""
+    keyboard = [
+        [InlineKeyboardButton("🅿️ PayPal", callback_data="pay_pay")],
+        [InlineKeyboardButton("💵 CashApp", callback_data="pay_cash")],
+        [InlineKeyboardButton("🌀 Revolut", callback_data="pay_rev")],
+        [InlineKeyboardButton("₿ Crypto (USDT)", callback_data="pay_cryp")]
+    ]
 
     await query.message.reply_text(
-        texto,
-        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("📤 Send Proof", callback_data="proof")]])
+        f"You selected: {PLANOS[plano][1]}\n\nNow, choose your payment method 👇",
+        reply_markup=InlineKeyboardMarkup(keyboard)
     )
+
+    # ===== DETALHES DO PAGAMENTO (NOVA FUNÇÃO) =====
+async def detalhes_pagamento(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await safe_answer(query)
+
+    metodo_key = query.data.split("_")[1]  # Pega 'pay', 'cash', etc.
+    nome, info, qr_code = METODOS_PAGAMENTO[metodo_key]
+    
+    plano = context.user_data.get("plano", "1m")
+    valor_plano = PLANOS[plano][1]
+
+    texto = f"""
+✅ *Selected Method:* {nome}
+💎 *Plan:* {valor_plano}
+
+{info}
+
+Please send the exact amount and then click the button below to send your proof.
+"""
+
+    keyboard = [[InlineKeyboardButton("📤 Send Proof", callback_data="proof")]]
+
+    # Envia a foto (QR Code) com a legenda e o botão
+    await query.message.reply_photo(
+        photo=qr_code,
+        caption=texto,
+        parse_mode="Markdown",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
 
 # ===== PROVA =====
 async def proof(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -368,27 +388,36 @@ async def check_expired(context: ContextTypes.DEFAULT_TYPE):
 # ===== APP =====
 app = ApplicationBuilder().token(TOKEN).build()
 
+# Comandos principais
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("admin", admin))
 
+# Fluxo de Usuário e Pagamento
 app.add_handler(CallbackQueryHandler(unlock, pattern="unlock"))
 app.add_handler(CallbackQueryHandler(select_plan, pattern="^plan_"))
+app.add_handler(CallbackQueryHandler(detalhes_pagamento, pattern="^pay_")) # <-- NOVO: Processa a escolha de pagamento
 app.add_handler(CallbackQueryHandler(proof, pattern="proof"))
 app.add_handler(CallbackQueryHandler(sub, pattern="sub"))
+
+# Painel Administrativo (Aprovação/Negação)
 app.add_handler(CallbackQueryHandler(aprovar, pattern="^aprovar"))
 app.add_handler(CallbackQueryHandler(negar, pattern="^negar"))
 
+# Funções de Admin
 app.add_handler(CallbackQueryHandler(adm_expirando, pattern="adm_expirando"))
 app.add_handler(CallbackQueryHandler(adm_total, pattern="adm_total"))
 app.add_handler(CallbackQueryHandler(adm_ativos, pattern="adm_ativos"))
 app.add_handler(CallbackQueryHandler(adm_ids, pattern="adm_ids"))
 app.add_handler(CallbackQueryHandler(adm_remove_start, pattern="adm_remove"))
 
+# Mensagens e Arquivos
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, adm_remove_exec))
 app.add_handler(MessageHandler(filters.PHOTO | filters.Document.ALL, receber))
 
-app.job_queue.run_repeating(check_warnings, interval=3600)
-app.job_queue.run_repeating(check_expired, interval=60)
+# Tarefas em segundo plano
+if app.job_queue:
+    app.job_queue.run_repeating(check_warnings, interval=3600)
+    app.job_queue.run_repeating(check_expired, interval=60)
 
 print("🔥 BOT ONLINE 24H 🔥")
 app.run_polling()
