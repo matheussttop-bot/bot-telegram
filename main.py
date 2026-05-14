@@ -14,22 +14,22 @@ SUPORTE = "https://t.me/teus_67"
 
 PAYPAL = "susanesantos4@gmail.com"
 CASHAPP = "$BassBaddict"
-REVOLUT = "@seu_usuario_revolut"
-CRYPTO_ADDRESS = "0xSeuEnderecoUSDTaqui"
+REVOLUT = "@matheus67"
+CRYPTO_ADDRESS = "TMPx4r6jEFEbYX1Vs2BoN6pXEdETFE39wJ"
 
 # Dicionário para facilitar a exibição de cada método
 METODOS_PAGAMENTO = {
-    "pay": ("PayPal", f"PayPal: {PAYPAL}", "https://media.discordapp.net/attachments/1317858068255473685/1504617442947760259/photo_2026-05-05_15-39-26.jpg?ex=6a07a3b0&is=6a065230&hm=50f479a5a216a6ca2f13c3962c3e38454d9e1c337a2cd96484877f21d1847b15&"),
-    "cash": ("CashApp", f"CashApp: {CASHAPP}", "https://via.placeholder.com/500"), # Link temporário
-    "rev": ("Revolut", f"Revolut: {REVOLUT}", "https://via.placeholder.com/500"),
-    "cryp": ("Crypto (USDT)", f"USDT Address:\n`{CRYPTO_ADDRESS}`", "https://via.placeholder.com/500")
+    "pay": ("PayPal", f"PayPal: {PAYPAL}", "https://media.discordapp.net/attachments/1493784274325737672/1504622536623783946/photo_2026-05-05_15-39-26.jpg?ex=6a07a86f&is=6a0656ef&hm=ec4e1119cd4e77e4158de16ffacdb152d2da9eee850de91a9ec2b86c8ac618d9&"),
+    "cash": ("CashApp", f"CashApp: {CASHAPP}", "https://media.discordapp.net/attachments/1493784274325737672/1504622575454785626/IMG_20260505_154000_475_2.jpg?ex=6a07a878&is=6a0656f8&hm=2f6e3715e896d12e10526dc47e8fe8081bb9e98b71c8a1b41e8f586ec7f1c1c9&"), # Link temporário
+    "rev": ("Revolut", f"Revolut: {REVOLUT}", "https://media.discordapp.net/attachments/1493784274325737672/1504622615111667722/photo_2026-05-14_18-48-52.jpg?ex=6a07a881&is=6a065701&hm=d1b46f1e6ccf5c2586ccb475a3bb09b4855780ea9ebf336a291c95dbf784bcff&"),
+    "cryp": ("Crypto (USDT)", f"USDT-TRX(TRC20):\n`{CRYPTO_ADDRESS}`", "https://media.discordapp.net/attachments/1493784274325737672/1504622650243416154/photo_2026-05-14_19-33-25.jpg?ex=6a07a88a&is=6a06570a&hm=8a9e1fbadce06524a3941563383c5901d23db926a0c44adf9f4d5d6a335691fe&")
 }
 
 PLANOS = {
-    "1m": (30, "1 Month — $25"),
+    "1m": (30, "1 Month — $20"),
     "3m": (90, "3 Months — $55"),
     "6m": (180, "6 Months — $85"),
-    "12m": (365, "🔥 BEST VALUE — 1 Year $120")
+    "12m": (365, "1 Year $120 (Best Deal)")
 }
 
 # ===== DATABASE =====
@@ -68,14 +68,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("💬 Support", url=SUPORTE)]
         ]
     else:
-        text = "Hi 😊\n\nWelcome! The VIP Farts Wardrobe group is a paid group with full access to exclusive content. We currently have over 40,000 videos and more than 100 models.\n\nLet me know if you’d like to join!"
+        text = "# Welcome!\n\nThe VIP Farts Wardrobe is a paid group with full access to exclusive content.\n\nWe currently have over 40,000 videos and more than 200 models, all organized and constantly updated!\n\nYou can make requests if you’re looking for something specific!\n\nClick below to subscribe ⬇️"
 
         keyboard = [
             [InlineKeyboardButton("🔓 Become a Member", callback_data="unlock")],
             [InlineKeyboardButton("💬 Support", url=SUPORTE)]
         ]
 
-    video_source = "https://animeshentai.tv/wp-content/uploads/2026/05/file_example_MP4_480_1_5MG.mp4"
+    video_source = "https://cdn.discordapp.com/attachments/1493784274325737672/1504631915682988062/1_4.mp4?ex=6a07b12b&is=6a065fab&hm=17228b82732cd526063778810fedec814f6651a1c5a0ce3f70d4a0b942a969f2&"
 
     await update.message.reply_video(
         video=video_source,
