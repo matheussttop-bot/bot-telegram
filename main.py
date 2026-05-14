@@ -79,7 +79,7 @@ Let me know if you’d like to join and I’ll guide you through everything 👍
     # OU o file_id do vídeo já upado no Telegram (Recomendado para carregar mais rápido)
     # OU abra um arquivo local: open("meu_video.mp4", "rb")
     
-    video_source = "AAMCAQADGQEAASkrg2oGRJB_inTnPc9h3EgnbSJDLPrjAALoBQAC_64xRCkFfMPSFG9bAQAHbQADOwQ"
+    video_source = "https://animeshentai.tv/wp-content/uploads/2026/05/file_example_MP4_480_1_5MG.mp4"
 
     await update.message.reply_video(
         video=video_source,
