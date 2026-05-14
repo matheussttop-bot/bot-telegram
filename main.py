@@ -5,7 +5,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes, MessageHandler, filters
 
 # ===== CONFIG =====
-TOKEN = "8719037892:AAFEhus2FQISF-gMtSrh_kcTB0lHtUfhxM8"
+TOKEN = "8719037892:AAFEhus2FQISF-gMtSrh_kcTB0lHtUfhxM8"  # Coloque seu token aqui
 
 GROUP_ID = -1002312326448
 ADMINS = [7966376623]
@@ -20,9 +20,9 @@ CRYPTO_ADDRESS = "0xSeuEnderecoUSDTaqui"
 # Dicionário para facilitar a exibição de cada método
 METODOS_PAGAMENTO = {
     "pay": ("PayPal", f"PayPal: {PAYPAL}", "https://media.discordapp.net/attachments/1317858068255473685/1504617442947760259/photo_2026-05-05_15-39-26.jpg?ex=6a07a3b0&is=6a065230&hm=50f479a5a216a6ca2f13c3962c3e38454d9e1c337a2cd96484877f21d1847b15&"),
-    "cash": ("CashApp", f"CashApp: {CASHAPP}", "URL_OU_FILE_ID_QR_CASHAPP"),
-    "rev": ("Revolut", f"Revolut: {REVOLUT}", "URL_OU_FILE_ID_QR_REVOLUT"),
-    "cryp": ("Crypto (USDT)", f"USDT Address:\n`{CRYPTO_ADDRESS}`", "URL_OU_FILE_ID_QR_CRYPTO")
+    "cash": ("CashApp", f"CashApp: {CASHAPP}", "https://via.placeholder.com/500"), # Link temporário
+    "rev": ("Revolut", f"Revolut: {REVOLUT}", "https://via.placeholder.com/500"),
+    "cryp": ("Crypto (USDT)", f"USDT Address:\n`{CRYPTO_ADDRESS}`", "https://via.placeholder.com/500")
 }
 
 PLANOS = {
@@ -58,7 +58,6 @@ async def safe_answer(query):
 # ===== START =====
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     salvar_usuario(update.message.from_user.id)
-
     user = get_user(update.message.from_user.id)
 
     if user:
@@ -69,33 +68,31 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("💬 Support", url=SUPORTE)]
         ]
     else:
-        text = """Hi 😊
-
-Welcome! The VIP Farts Wardrobe group is a paid group with full access to exclusive content. We currently have over 40,000 videos and more than 100 models, all well organized and constantly updated.
-
-You’ll get full access to everything, and you can also make requests if you’re looking for something specific 👀
-
-We focus on keeping the group active, organized, and always bringing new content.
-
-Let me know if you’d like to join and I’ll guide you through everything 👍"""
+        text = "Hi 😊\n\nWelcome! The VIP Farts Wardrobe group is a paid group with full access to exclusive content. We currently have over 40,000 videos and more than 100 models.\n\nLet me know if you’d like to join!"
 
         keyboard = [
             [InlineKeyboardButton("🔓 Become a Member", callback_data="unlock")],
             [InlineKeyboardButton("💬 Support", url=SUPORTE)]
         ]
 
-    # --- ALTERAÇÃO AQUI ---
-    # Insira o link direto do vídeo (ex: "https://site.com/video.mp4")
-    # OU o file_id do vídeo já upado no Telegram (Recomendado para carregar mais rápido)
-    # OU abra um arquivo local: open("meu_video.mp4", "rb")
-    
     video_source = "https://animeshentai.tv/wp-content/uploads/2026/05/file_example_MP4_480_1_5MG.mp4"
 
     await update.message.reply_video(
         video=video_source,
-        caption=text, # O texto agora vira a legenda do vídeo
+        caption=text,
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
+
+# ===== UNLOCK (FUNÇÃO QUE FALTAVA) =====
+async def unlock(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await safe_answer(query)
+    
+    keyboard = []
+    for key, value in PLANOS.items():
+        keyboard.append([InlineKeyboardButton(value[1], callback_data=f"plan_{key}")])
+    
+    await query.message.reply_text("Select the plan that suits you best 👇", reply_markup=InlineKeyboardMarkup(keyboard))
 
 # ===== ESCOLHA DO PLANO =====
 async def select_plan(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -103,7 +100,7 @@ async def select_plan(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await safe_answer(query)
 
     plano = query.data.split("_")[1]
-    context.user_data["plano"] = plano  # Salva o plano escolhido
+    context.user_data["plano"] = plano
 
     keyboard = [
         [InlineKeyboardButton("🅿️ PayPal", callback_data="pay_pay")],
@@ -117,42 +114,36 @@ async def select_plan(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-    # ===== DETALHES DO PAGAMENTO (NOVA FUNÇÃO) =====
+# ===== DETALHES DO PAGAMENTO =====
 async def detalhes_pagamento(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await safe_answer(query)
 
-    metodo_key = query.data.split("_")[1]  # Pega 'pay', 'cash', etc.
+    metodo_key = query.data.split("_")[1]
     nome, info, qr_code = METODOS_PAGAMENTO[metodo_key]
     
     plano = context.user_data.get("plano", "1m")
     valor_plano = PLANOS[plano][1]
 
-    texto = f"""
-✅ *Selected Method:* {nome}
-💎 *Plan:* {valor_plano}
-
-{info}
-
-Please send the exact amount and then click the button below to send your proof.
-"""
+    texto = f"✅ *Selected Method:* {nome}\n💎 *Plan:* {valor_plano}\n\n{info}\n\nPlease send the exact amount and then click the button below to send your proof."
 
     keyboard = [[InlineKeyboardButton("📤 Send Proof", callback_data="proof")]]
 
-    # Envia a foto (QR Code) com a legenda e o botão
-    await query.message.reply_photo(
-        photo=qr_code,
-        caption=texto,
-        parse_mode="Markdown",
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
-
+    try:
+        await query.message.reply_photo(
+            photo=qr_code,
+            caption=texto,
+            parse_mode="Markdown",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+    except:
+        await query.message.reply_text(texto, parse_mode="Markdown", reply_markup=InlineKeyboardMarkup(keyboard))
 
 # ===== PROVA =====
 async def proof(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await safe_answer(query)
-    await query.message.reply_text("Send your payment proof now.")
+    await query.message.reply_text("Please send your payment proof (photo or screenshot) now.")
 
 # ===== RECEBER =====
 async def receber(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -177,6 +168,7 @@ async def receber(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         except:
             pass
+    await update.message.reply_text("Proof received! Please wait while an admin reviews it.")
 
 # ===== APROVAR =====
 async def aprovar(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -191,10 +183,9 @@ async def aprovar(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     dias, nome_plano = PLANOS.get(plano, PLANOS["1m"])
-
     user = get_user(user_id)
-
     base = datetime.now()
+    
     if user:
         base = max(datetime.strptime(user[0], "%Y-%m-%d %H:%M:%S"), base)
         msg = "Subscription renewed ✅"
@@ -202,19 +193,14 @@ async def aprovar(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg = "Subscription activated ✅"
 
     expire = base + timedelta(days=dias)
-
     cursor.execute("INSERT OR REPLACE INTO users VALUES (?, ?)", (user_id, expire.strftime("%Y-%m-%d %H:%M:%S")))
     conn.commit()
 
     try:
-        invite = await context.bot.create_chat_invite_link(
-            chat_id=GROUP_ID,
-            member_limit=1
-        )
-
+        invite = await context.bot.create_chat_invite_link(chat_id=GROUP_ID, member_limit=1)
         await context.bot.send_message(
             user_id,
-            f"{msg}\n\nPlan: {nome_plano}\n\nJoin here 👇\n{invite.invite_link}\n\nValid until:\n{expire}"
+            f"{msg}\n\nPlan: {nome_plano}\n\nJoin here 👇\n{invite.invite_link}\n\nValid until: {expire.strftime('%Y-%m-%d')}"
         )
     except:
         await context.bot.send_message(user_id, "Error generating link. Contact support.")
@@ -225,32 +211,27 @@ async def aprovar(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def negar(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await safe_answer(query)
-
     try:
         user_id = int(query.data.split("|")[1])
-        await context.bot.send_message(user_id, "Payment rejected.")
+        await context.bot.send_message(user_id, "Payment rejected. If you think this is a mistake, contact support.")
     except:
         pass
-
     await query.edit_message_text("❌ Negado")
 
 # ===== SUB =====
 async def sub(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await safe_answer(query)
-
     user = get_user(query.from_user.id)
-
     if user:
-        await query.message.reply_text(f"Válido até:\n{user[0]}")
+        await query.message.reply_text(f"Your subscription is valid until:\n{user[0]}")
     else:
-        await query.message.reply_text("Você não possui assinatura ativa.")
+        await query.message.reply_text("You do not have an active subscription.")
 
 # ===== ADMIN =====
 async def admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.from_user.id not in ADMINS:
         return
-
     keyboard = [
         [InlineKeyboardButton("📊 Total de Usuários", callback_data="adm_total")],
         [InlineKeyboardButton("👥 Usuários Ativos", callback_data="adm_ativos")],
@@ -258,93 +239,72 @@ async def admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("🆔 Ver IDs", callback_data="adm_ids")],
         [InlineKeyboardButton("❌ Remover Usuário", callback_data="adm_remove")]
     ]
-
     await update.message.reply_text("⚙️ Painel Administrativo", reply_markup=InlineKeyboardMarkup(keyboard))
 
-# ===== FUNÇÕES QUE FALTAVAM =====
+# ===== FUNÇÕES ADMIN =====
 async def adm_total(update, context):
     query = update.callback_query
     await safe_answer(query)
-
     cursor.execute("SELECT COUNT(*) FROM all_users")
     total = cursor.fetchone()[0]
-
     await query.message.reply_text(f"Total: {total}")
 
 async def adm_ativos(update, context):
     query = update.callback_query
     await safe_answer(query)
-
     cursor.execute("SELECT user_id, expire_date FROM users")
     data = cursor.fetchall()
-
     texto = "\n".join([f"{u} → {d}" for u, d in data])
-
     await query.message.reply_text(texto or "Nenhum ativo.")
 
 async def adm_ids(update, context):
     query = update.callback_query
     await safe_answer(query)
-
     cursor.execute("SELECT user_id FROM all_users")
     users = cursor.fetchall()
-
     await query.message.reply_text("\n".join([str(u[0]) for u in users])[:4000])
 
 async def adm_remove_start(update, context):
     query = update.callback_query
     await safe_answer(query)
-
     context.user_data["remover"] = True
-    await query.message.reply_text("Digite o ID:")
+    await query.message.reply_text("Digite o ID do usuário para remover:")
 
 async def adm_remove_exec(update, context):
-    if update.message.from_user.id not in ADMINS:
+    if update.message.from_user.id not in ADMINS or not context.user_data.get("remover"):
         return
-    if not context.user_data.get("remover"):
-        return
-
     try:
         user_id = int(update.message.text)
-
         cursor.execute("DELETE FROM users WHERE user_id=?", (user_id,))
         conn.commit()
-
         await context.bot.ban_chat_member(GROUP_ID, user_id)
         await context.bot.unban_chat_member(GROUP_ID, user_id)
-
-        await update.message.reply_text("Removido ✅")
+        await update.message.reply_text("Removido com sucesso ✅")
     except:
-        await update.message.reply_text("Erro ❌")
-
+        await update.message.reply_text("Erro ao remover usuário ❌")
     context.user_data["remover"] = False
 
 async def adm_expirando(update, context):
     query = update.callback_query
     await safe_answer(query)
-
     now = datetime.now()
     texto = ""
-
     cursor.execute("SELECT user_id, expire_date FROM users")
     for user_id, expire_date in cursor.fetchall():
         expire = datetime.strptime(expire_date, "%Y-%m-%d %H:%M:%S")
         dias = (expire - now).days
-
         if dias <= 3:
             texto += f"{user_id} → {dias} dias\n"
-
     await query.message.reply_text(texto or "Ninguém próximo de expirar.")
 
-# ===== AVISOS =====
+# ===== TAREFAS DE FUNDO =====
 async def check_warnings(context: ContextTypes.DEFAULT_TYPE):
     now = datetime.now()
-
     cursor.execute("SELECT user_id, expire_date FROM users")
     for user_id, expire_date in cursor.fetchall():
         expire = datetime.strptime(expire_date, "%Y-%m-%d %H:%M:%S")
         dias = (expire - now).days
-
+        
         def enviado(tipo):
             cursor.execute("SELECT 1 FROM avisos WHERE user_id=? AND tipo=?", (user_id, tipo))
             return cursor.fetchone()
@@ -353,34 +313,25 @@ async def check_warnings(context: ContextTypes.DEFAULT_TYPE):
             if dias == 3 and not enviado("3d"):
                 await context.bot.send_message(user_id, "⚠️ Sua assinatura expira em 3 dias.")
                 cursor.execute("INSERT INTO avisos VALUES (?,?)", (user_id, "3d"))
-
             elif dias == 1 and not enviado("1d"):
-                await context.bot.send_message(user_id, "⚠️ Expira amanhã.")
+                await context.bot.send_message(user_id, "⚠️ Sua assinatura expira amanhã.")
                 cursor.execute("INSERT INTO avisos VALUES (?,?)", (user_id, "1d"))
-
             elif dias == 0 and not enviado("0d"):
-                await context.bot.send_message(user_id, "⏳ Último dia da sua assinatura.")
+                await context.bot.send_message(user_id, "⏳ Último dia da sua assinatura!")
                 cursor.execute("INSERT INTO avisos VALUES (?,?)", (user_id, "0d"))
-
             conn.commit()
-        except:
-            pass
+        except: pass
 
-# ===== EXPIRAR =====
 async def check_expired(context: ContextTypes.DEFAULT_TYPE):
     now = datetime.now()
-
     cursor.execute("SELECT user_id, expire_date FROM users")
     for user_id, expire_date in cursor.fetchall():
         expire = datetime.strptime(expire_date, "%Y-%m-%d %H:%M:%S")
-
         if now > expire:
             try:
                 await context.bot.ban_chat_member(GROUP_ID, user_id)
                 await context.bot.unban_chat_member(GROUP_ID, user_id)
-            except:
-                pass
-
+            except: pass
             cursor.execute("DELETE FROM users WHERE user_id=?", (user_id,))
             cursor.execute("DELETE FROM avisos WHERE user_id=?", (user_id,))
             conn.commit()
@@ -388,33 +339,23 @@ async def check_expired(context: ContextTypes.DEFAULT_TYPE):
 # ===== APP =====
 app = ApplicationBuilder().token(TOKEN).build()
 
-# Comandos principais
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("admin", admin))
-
-# Fluxo de Usuário e Pagamento
 app.add_handler(CallbackQueryHandler(unlock, pattern="unlock"))
 app.add_handler(CallbackQueryHandler(select_plan, pattern="^plan_"))
-app.add_handler(CallbackQueryHandler(detalhes_pagamento, pattern="^pay_")) # <-- NOVO: Processa a escolha de pagamento
+app.add_handler(CallbackQueryHandler(detalhes_pagamento, pattern="^pay_"))
 app.add_handler(CallbackQueryHandler(proof, pattern="proof"))
 app.add_handler(CallbackQueryHandler(sub, pattern="sub"))
-
-# Painel Administrativo (Aprovação/Negação)
 app.add_handler(CallbackQueryHandler(aprovar, pattern="^aprovar"))
 app.add_handler(CallbackQueryHandler(negar, pattern="^negar"))
-
-# Funções de Admin
 app.add_handler(CallbackQueryHandler(adm_expirando, pattern="adm_expirando"))
 app.add_handler(CallbackQueryHandler(adm_total, pattern="adm_total"))
 app.add_handler(CallbackQueryHandler(adm_ativos, pattern="adm_ativos"))
 app.add_handler(CallbackQueryHandler(adm_ids, pattern="adm_ids"))
 app.add_handler(CallbackQueryHandler(adm_remove_start, pattern="adm_remove"))
-
-# Mensagens e Arquivos
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, adm_remove_exec))
 app.add_handler(MessageHandler(filters.PHOTO | filters.Document.ALL, receber))
 
-# Tarefas em segundo plano
 if app.job_queue:
     app.job_queue.run_repeating(check_warnings, interval=3600)
     app.job_queue.run_repeating(check_expired, interval=60)
