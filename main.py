@@ -74,7 +74,18 @@ Let me know if you’d like to join and I’ll guide you through everything 👍
             [InlineKeyboardButton("💬 Support", url=SUPORTE)]
         ]
 
-    await update.message.reply_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
+    # --- ALTERAÇÃO AQUI ---
+    # Insira o link direto do vídeo (ex: "https://site.com/video.mp4")
+    # OU o file_id do vídeo já upado no Telegram (Recomendado para carregar mais rápido)
+    # OU abra um arquivo local: open("meu_video.mp4", "rb")
+    
+    video_source = "AAMCAQADGQEAASkrg2oGRJB_inTnPc9h3EgnbSJDLPrjAALoBQAC_64xRCkFfMPSFG9bAQAHbQADOwQ"
+
+    await update.message.reply_video(
+        video=video_source,
+        caption=text, # O texto agora vira a legenda do vídeo
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
 
 # ===== PLANOS =====
 async def unlock(update: Update, context: ContextTypes.DEFAULT_TYPE):
