@@ -75,7 +75,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("💬 Support", url=SUPORTE)]
         ]
 
-    video_source = "https://cdn.discordapp.com/attachments/1493784274325737672/1504631915682988062/1_4.mp4?ex=6a07b12b&is=6a065fab&hm=17228b82732cd526063778810fedec814f6651a1c5a0ce3f70d4a0b942a969f2&"
+    video_source = "https://www.image2url.com/r2/default/videos/1778803974508-148b41f7-7a0e-4b27-8745-455b58045dce.mp4"
 
     await update.message.reply_video(
         video=video_source,
