@@ -75,13 +75,22 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("💬 Support", url=SUPORTE)]
         ]
 
-    video_source = "https://www.image2url.com/r2/default/videos/1778803974508-148b41f7-7a0e-4b27-8745-455b58045dce.mp4"
+    video_source = "https://www.dropbox.com/scl/fi/szkfy3ptz7kmrk0g2jx6e/1_4.mp4?rlkey=lf1iy69o2gp8x40ointgac8yw&st=30wguap2&dl=1"
 
-    await update.message.reply_video(
-        video=video_source,
-        caption=text,
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
+try:
+        # Tenta enviar o vídeo com a legenda e botões
+        await update.message.reply_video(
+            video=video_source,
+            caption=text,
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+    except Exception as e:
+        # Se o link do vídeo der erro (ex: link quebrado), ele envia só o texto
+        print(f"Erro ao carregar vídeo: {e}")
+        await update.message.reply_text(
+            text=text,
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
 
 # ===== UNLOCK (FUNÇÃO QUE FALTAVA) =====
 async def unlock(update: Update, context: ContextTypes.DEFAULT_TYPE):
