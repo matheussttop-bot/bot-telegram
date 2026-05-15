@@ -75,7 +75,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("💬 Support", url=SUPORTE)]
         ]
 
-    video_source = "https://www.dropbox.com/scl/fi/szkfy3ptz7kmrk0g2jx6e/1_4.mp4?rlkey=lf1iy69o2gp8x40ointgac8yw&st=30wguap2&dl=1"
+    video_source = "https://www.dropbox.com/scl/fi/szkfy3ptz7kmrk0g2jx6e/1_4.mp4?raw=1"
 
 try:
         # Tenta enviar o vídeo com a legenda e botões
