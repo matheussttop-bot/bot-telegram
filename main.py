@@ -68,7 +68,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("💬 Support", url=SUPORTE)]
         ]
     else:
-        text = "# Welcome!\n\nThe VIP Farts Wardrobe is a paid group with full access to exclusive content.\n\nWe currently have over 40,000 videos and more than 200 models, all organized and constantly updated!\n\nYou can make requests if you’re looking for something specific!\n\nClick below to subscribe ⬇️"
+        text = "Welcome!\n\nThe VIP Farts Wardrobe is a paid group with full access to exclusive content.\n\nWe currently have over 40,000 videos and more than 200 models, all organized and constantly updated!\n\nYou can make requests if you’re looking for something specific!\n\nClick below to subscribe ⬇️"
 
         keyboard = [
             [InlineKeyboardButton("🔓 Become a Member", callback_data="unlock")],
@@ -77,7 +77,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     video_source = "https://files.catbox.moe/mhk2bn.mp4"
 
-try:
+    # CORREÇÃO: Colocado dentro da função start (indentação corrigida)
+    try:
         # Tenta enviar o vídeo com a legenda e botões
         await update.message.reply_video(
             video=video_source,
@@ -92,7 +93,7 @@ try:
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
 
-# ===== UNLOCK (FUNÇÃO QUE FALTAVA) =====
+# ===== UNLOCK =====
 async def unlock(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await safe_answer(query)
@@ -280,7 +281,7 @@ async def adm_remove_start(update, context):
     await query.message.reply_text("Digite o ID do usuário para remover:")
 
 async def adm_remove_exec(update, context):
-    if update.message.from_user.id not in ADMINS or not context.user_data.get("remover"):
+    if not update.message or update.message.from_user.id not in ADMINS or not context.user_data.get("remover"):
         return
     try:
         user_id = int(update.message.text)
