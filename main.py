@@ -22,7 +22,7 @@ METODOS_PAGAMENTO = {
     "pay": ("PayPal", f"PayPal: {PAYPAL}", "https://media.discordapp.net/attachments/1493784274325737672/1504622536623783946/photo_2026-05-05_15-39-26.jpg?ex=6a07a86f&is=6a0656ef&hm=ec4e1119cd4e77e4158de16ffacdb152d2da9eee850de91a9ec2b86c8ac618d9&"),
     "cash": ("CashApp", f"CashApp: {CASHAPP}", "https://media.discordapp.net/attachments/1493784274325737672/1504622575454785626/IMG_20260505_154000_475_2.jpg?ex=6a07a878&is=6a0656f8&hm=2f6e3715e896d12e10526dc47e8fe8081bb9e98b71c8a1b41e8f586ec7f1c1c9&"), # Link temporário
     "rev": ("Revolut", f"Revolut: {REVOLUT}", "https://media.discordapp.net/attachments/1493784274325737672/1504622615111667722/photo_2026-05-14_18-48-52.jpg?ex=6a07a881&is=6a065701&hm=d1b46f1e6ccf5c2586ccb475a3bb09b4855780ea9ebf336a291c95dbf784bcff&"),
-    "cryp": ("Crypto (USDT)", f"USDT-TRX(TRC20):\n`{CRYPTO_ADDRESS}`", "https://media.discordapp.net/attachments/1493784274325737672/1504622650243416154/photo_2026-05-14_19-33-25.jpg?ex=6a07a88a&is=6a06570a&hm=8a9e1fbadce06524a3941563383c5901d23db926a0c44adf9f4d5d6a335691fe&")
+    "cryp": ("Crypto (USDT)", f"USDT TRX(TRC20):\n`{CRYPTO_ADDRESS}`", "https://media.discordapp.net/attachments/1493784274325737672/1504622650243416154/photo_2026-05-14_19-33-25.jpg?ex=6a07a88a&is=6a06570a&hm=8a9e1fbadce06524a3941563383c5901d23db926a0c44adf9f4d5d6a335691fe&")
 }
 
 PLANOS = {
